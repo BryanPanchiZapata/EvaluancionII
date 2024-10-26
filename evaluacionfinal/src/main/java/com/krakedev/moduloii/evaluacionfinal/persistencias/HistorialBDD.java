@@ -1,5 +1,73 @@
 package com.krakedev.moduloii.evaluacionfinal.persistencias;
 
-public class HistorialBDD {
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
+import com.krakedev.moduloii.evaluacionfinal.entidades.RegistroMovimiento;
+import com.krakedev.moduloii.evaluacionfinal.excepciones.InventarioException;
+import com.krakedev.moduloii.evaluacionfinal.utils.ConexionBDD;
+
+public class HistorialBDD {
+	public void insertarMovimientodeEntrada (RegistroMovimiento registroMovimiento) throws InventarioException {
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		try {
+			con = ConexionBDD.obtenerConexion();
+			ps = con.prepareStatement("insert into registro_movimientos (id_articulo, cantidad, fecha_movimiento ) values (?, ?, ?)");
+			ps.setString(1, registroMovimiento.getIdArticulo());
+			if (registroMovimiento.getCantidad() >0 ) {
+				ps.setInt(2, registroMovimiento.getCantidad());
+			}
+			ps.setDate(3, new java.sql.Date(registroMovimiento.getFechaMovimiento().getTime()));
+			
+			ps.executeUpdate();
+			
+		} catch (SQLException e) {
+			throw new InventarioException("Error al insertar el movimiento. Detalle" + e.getMessage());
+		} catch (InventarioException e) {
+			throw e;
+		} finally {
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					throw new InventarioException("Error con la base de datos");
+				}
+
+			}
+		}
+	}
+	public void insertarMovimientodeSalida (RegistroMovimiento registroMovimiento) throws InventarioException {
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		try {
+			con = ConexionBDD.obtenerConexion();
+			ps = con.prepareStatement("insert into registro_movimientos (id_articulo, cantidad, fecha_movimiento ) values (?, ?, ?)");
+			ps.setString(1, registroMovimiento.getIdArticulo());
+			if (registroMovimiento.getCantidad() < 0 ) {
+				ps.setInt(2, registroMovimiento.getCantidad());
+				
+			}
+			ps.setDate(3, new java.sql.Date(registroMovimiento.getFechaMovimiento().getTime()));
+			
+			ps.executeUpdate();
+			
+		} catch (SQLException e) {
+			throw new InventarioException("Error al insertar el movimiento. Detalle" + e.getMessage());
+		} catch (InventarioException e) {
+			throw e;
+		} finally {
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					throw new InventarioException("Error con la base de datos");
+				}
+
+			}
+		}
+	}
 }
