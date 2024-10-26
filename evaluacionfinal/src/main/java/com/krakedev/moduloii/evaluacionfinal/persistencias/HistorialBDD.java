@@ -4,11 +4,36 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import com.krakedev.moduloii.evaluacionfinal.entidades.Grupo;
 import com.krakedev.moduloii.evaluacionfinal.entidades.RegistroMovimiento;
 import com.krakedev.moduloii.evaluacionfinal.excepciones.InventarioException;
 import com.krakedev.moduloii.evaluacionfinal.utils.ConexionBDD;
 
 public class HistorialBDD {
+	public void insertarGrupo(Grupo grupo) throws InventarioException{
+		Connection con=null;
+		try {
+			con=ConexionBDD.obtenerConexion();
+			PreparedStatement ps=con.prepareStatement("insert into grupos(id,nombre) values(?,?)");
+			ps.setString(1, grupo.getIdGrupo());
+			ps.setString(2, grupo.getNombre());
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new InventarioException("Error al insertar el grupo. Detalle: "+e.getMessage());
+		} catch (InventarioException e) {
+			throw e;
+		}finally {
+			if(con!=null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
 	public void insertarMovimientodeEntrada (RegistroMovimiento registroMovimiento) throws InventarioException {
 		Connection con = null;
 		PreparedStatement ps = null;
